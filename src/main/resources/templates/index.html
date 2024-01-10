@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="en">
+<meta charset="UTF-8">
+<title>Page Title</title>
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<link rel="stylesheet" href="">
+
+<head>
+	<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
+</head>
+
+<style>
+</style>
+
+
+<body>
+
+	<div>
+		<table id="table">
+			<tr>
+				<th>Id</th>
+				<th>Title</th>
+				<th>Year</th>
+			</tr>
+		</table>
+
+		<button id="getAll">getAll</button>
+	</div>
+
+	<br>
+
+	<div>
+		<input id="id" type="number">
+		<button id="getById">getById</button>
+
+
+		<div id="movieById">
+
+		</div>
+	</div>
+
+	<br>
+
+	<div>
+		<button id="form">
+			FORM 
+		</button>
+	</div>
+
+	<br>
+
+	<div>
+		<a href="/update">UPDATE</a>
+	</div>
+
+
+
+</body>
+
+</html>
+
+<script>
+
+	//getAll
+	$(document).ready(() => {
+		$("#getAll").click(() => {
+			$.ajax({
+				url: "http://localhost:8080/getAll", success: (result) => {
+					console.log(result);
+					$.each(result, (key, value) => {
+						$("#table").append(
+							"<tr>" +
+							`<td>${value.id}</td>` +
+							`<td>${value.title}</td>` +
+							`<td>${value.year}</td>` +
+							`<td><button onClick="deleteMovie(${value.id})"> DELETE </button></td>` +
+							"<tr>"
+						)
+					})
+
+				}
+			})
+		})
+	})
+
+	//getById
+	$(document).ready(() => {
+		$("#getById").click(() => {
+			$("#movieById").empty();
+			id = document.getElementById("id").value;
+
+			$.get(`http://localhost:8080/getById?id=${id}`, (result, status, code) => {
+
+				console.log(status);
+				console.log(result);
+
+				$("#movieById").append(
+					"<p>Id:" + result.id + "<p>" +
+					"<p>Title:" + result.title + "<p>" +
+					"<p>Year:" + result.year + "<p>"
+
+				)
+			})
+		})
+	})
+
+	//go to Form
+	$(document).ready(() => {
+		$("#form").click(() => {
+			window.location.href = "http://localhost:8080/form";
+		})
+	})
+
+	//deleteMovie()
+	function deleteMovie(id) {
+		$.ajax({
+			url: `http://localhost:8080/deleteById?id=${id}`,
+			method: "DELETE",
+			success: (result) => {
+				($("#table").empty(),
+					$.each(result, (key, value) => {
+						$("#table").append(
+							"<tr>" +
+							`<td>${value.id}</td>` +
+							`<td>${value.title}</td>` +
+							`<td>${value.year}</td>` +
+							`<td><button onClick="deleteMovie(${value.id})"> DELETE </button></td>` +
+							"<tr>"
+						)
+					}))
+			}
+		})
+	}
+
+
+
+
+
+</script>

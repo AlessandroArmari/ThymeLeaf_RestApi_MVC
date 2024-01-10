@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="en">
+<meta charset="UTF-8">
+<title>Page Title</title>
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<link rel="stylesheet" href="">
+<style>
+</style>
+<script src=""></script>
+
+<body>
+	<h3>UPDATE</h3>
+
+	<div>
+		<label for="title">SELECT ID:</label>
+
+		<select id="select" th:if="${idList !=null}">
+			<option disabled selected> ID </option>
+			<option th:each="id : ${idList}" th:text="${id}" th:value="${id}"></option>
+		</select>
+
+		<select th:if="${idList ==null}">
+			<option>La tua lista è: null</option>
+		</select>
+	</div>
+
+	<div>
+		<label for="title">Title</label>
+		<input name="title" id="title" type="text">
+	</div>
+
+	<div>
+		<label for="year">Year</label>
+		<input name="year" id="year" type="number">
+	</div>
+
+	<input name="id" type="hidden" value="0">
+
+	<div>
+		<button id="update">UPDATE</button>
+	</div>
+
+	<br>
+
+	<div id="info">
+
+	</div>
+
+</body>
+
+<script>
+
+	var select = document.getElementById("select");
+	var title = document.getElementById("title");
+	var year = document.getElementById("year");
+	var info = document.getElementById("info");
+
+	select.addEventListener("change", () => {
+		var id = select.value;
+		console.log(id);
+		fetch(`http://localhost:8080/getById?id= ${id}`)
+			.then(response => {
+				if (!response.ok) {
+					info.innerHTML = "Server Error"
+				} else return response.json();
+
+			}).then(data => {
+				console.log(data);
+
+				title.value = data.title;
+				year.value = data.year;
+			})
+	})
+
+	// +++ UPDATE +++
+
+	var update = document.getElementById("update");
+
+	update.addEventListener("click", () => {
+
+		var id = select.value;
+		var newTitle = title.value;
+		var newYear = year.value;
+
+		var newMovie = {title: newTitle, year: newYear};
+
+		
+		fetch(`http://localhost:8080/updateById?id=${id}`, {
+			method: 'PUT',
+			headers: {
+				'Content-Type': 'application/json'
+			},
+			body: JSON.stringify(newMovie)
+			
+		}).then( response => {
+			if(!response.ok){
+				info.innerHTML = "Server Error"
+			} else {
+				return response.json();
+			}
+		}).then( data => {
+			console.log(data);
+
+			title.value = data.title;
+			year.value = data.year;
+			info.innerHTML = "MOVIE UPDATED"
+		})
+		
+
+	})
+
+
+
+
+</script>
